@@ -1,0 +1,50 @@
+# docker-compose.yml — runs the API + a PostgreSQL database together.
+#
+# Generic .NET startup: rename the DB/user/db-name below per project if you like.
+# Laravel analogy: Laravel Sail. `docker compose up` is your `sail up`.
+# Two services on one private network so the API can reach the DB by name ("db").
+#
+#   docker compose up --build      # build + start everything
+#   docker compose down            # stop (keeps the data volume)
+#   docker compose down -v         # stop AND wipe the database volume
+
+services:
+  db:
+    image: postgres:17
+    container_name: dotnet-app-db
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_dev_pw       # dev only — real secrets via env/secret store
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"          # expose to host so you can connect with a DB GUI
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # named volume = data survives restarts
+    healthcheck:
+      # Compose waits for this to pass before starting the API (depends_on below).
+      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dotnet-app-api
+    depends_on:
+      db:
+        condition: service_healthy   # don't start the API until Postgres is ready
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # Connection string via env var. .NET maps the double-underscore to nested
+      # config: ConnectionStrings__Default  ->  ConnectionStrings:Default.
+      # Host is "db" — the compose service name, resolved on the private network.
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=app_db;Username=app_user;Password=app_dev_pw"
+      # JWT secret as an env var (in prod use a real secret store).
+      Jwt__Secret: "dev-only-super-secret-change-me-at-least-32-chars-long"
+    ports:
+      - "8080:8080"          # http://localhost:8080
+
+volumes:
+  pgdata:

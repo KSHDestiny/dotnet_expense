@@ -1,0 +1,35 @@
+# Keep the Docker build context small + avoid copying host build artifacts into
+# the image (they'd be the wrong platform anyway). Like .gitignore, but for the
+# `docker build` context.
+
+# Build outputs (recreated inside the build stage)
+**/bin/
+**/obj/
+
+# Git + IDE
+.git/
+.gitignore
+.vs/
+.vscode/
+.idea/
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Docs / notes — not needed in the image
+notes/
+docs/
+*.md
+.claude/
+
+# Local secrets / env
+**/*.env
+.env*
+**/appsettings.*.json.local
+
+# SQLite leftovers
+*.db
+*.db-shm
+*.db-wal

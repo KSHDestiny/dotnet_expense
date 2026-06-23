@@ -1,0 +1,60 @@
+# .editorconfig — enforces the C# style described in CLAUDE.md.
+# The IDE and `dotnet build`/`dotnet format` read this. Think of it as the
+# .NET equivalent of Laravel Pint / PHP-CS-Fixer config, but built into the
+# tooling — no extra package needed.
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# C# files
+[*.cs]
+indent_size = 4
+max_line_length = 120
+
+# --- C# language conventions (match CLAUDE.md) ---
+
+# Prefer `var` when the type is obvious (CLAUDE.md style rule).
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# File-scoped namespaces (CLAUDE.md style rule). `error` makes the build fail
+# if someone uses the old block-scoped { } namespace.
+csharp_style_namespace_declarations = file_scoped:error
+
+# Expression-bodied members where they read clearly.
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+
+# Modern C# niceties.
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_prefer_primary_constructors = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+
+# Nullable / null handling.
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+
+# Usings: System.* first, then sorted. (EF/ASP imports stay tidy.)
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace:suggestion
+
+# Naming: interfaces start with I, async methods... (defaults are sensible;
+# we keep it light while learning rather than failing the build on naming.)
+
+# --- Non-code files ---
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.{csproj,props,targets}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false  # trailing spaces can be meaningful in md

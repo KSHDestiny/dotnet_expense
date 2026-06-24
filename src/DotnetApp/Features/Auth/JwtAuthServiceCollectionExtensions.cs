@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using DotnetApp.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -47,6 +48,10 @@ public static class JwtAuthServiceCollectionExtensions
             });
 
         services.AddAuthorization();
+
+        // Current-user accessor: per-request, reads the validated JWT claims.
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }

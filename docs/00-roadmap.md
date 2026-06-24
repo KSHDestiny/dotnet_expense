@@ -33,6 +33,32 @@ User 1──* Expense *──1 Category
 
 ---
 
+## API design — hybrid REST + GraphQL
+
+Two API surfaces in one app, by design:
+
+- **REST** handles **auth**: `POST /auth/register`, `POST /auth/login` (issue JWT).
+- **GraphQL** (Hot Chocolate, `/graphql`) handles **everything else**: categories,
+  expenses, summaries — as queries + mutations.
+
+Both share the same JWT bearer token: REST issues it; the client sends it in the
+`Authorization` header to GraphQL too. The Step 4 auth middleware and the Step 5
+`ICurrentUser` accessor are reused unchanged by GraphQL resolvers (`[Authorize]`).
+
+```
+REST    → /auth/register, /auth/login           issues JWT
+GraphQL → /graphql   [Authorize]                categories, expenses, summaries
+            ↑ same Bearer token validated by the existing JwtBearer middleware
+```
+
+**Why hybrid:** auth is a natural request/response fit for REST and stays simple;
+the data API benefits from GraphQL's single endpoint, client-shaped queries, and
+EF-pushed filtering/paging. Demonstrates integrating both paradigms cleanly.
+
+**GraphQL stack:** Hot Chocolate, **annotation-based** (code-first) — plain C#
+`Query`/`Mutation` classes with `[Authorize]`/resolver attributes; the schema is
+inferred. EF Core integration for projection/filtering/paging.
+
 ## Architecture
 
 A **pragmatic layered architecture** in a single Web project, split into folders by
@@ -50,9 +76,10 @@ src/DotnetApp/
 │   ├── Persistence/            # AppDbContext, EF configurations, migrations
 │   └── <cross-cutting>/        # JWT token service, password hasher, etc.
 ├── Features/                   # vertical slices: one folder per feature
-│   ├── Auth/                   #   endpoints + request/response DTOs + handler/service
-│   ├── Categories/
-│   └── Expenses/
+│   ├── Auth/                   #   REST endpoints + DTOs + service (register/login/JWT)
+│   ├── Categories/             #   GraphQL query/mutation types + service
+│   └── Expenses/               #   GraphQL query/mutation types + service
+├── GraphQL/                    # root Query/Mutation, schema config, error filter
 ├── Common/                     # shared: results, errors, pagination, extensions
 │   ├── Errors/
 │   └── Extensions/             # IServiceCollection / IEndpointRouteBuilder ext methods
@@ -87,24 +114,28 @@ src/DotnetApp/
 | 2  | **Folder structure + DI conventions + Options pattern** | Composition root, service registration extensions, strongly-typed config |
 | 3  | **Auth: register + login** (password hashing) | Vertical slice, DTOs, service layer, Result pattern |
 | 4  | **JWT issuing + authentication** | Token service, `JwtBearer`, Options pattern for secrets |
-| 5  | **Authorization + current-user accessor** | `[Authorize]` / `RequireAuthorization`, claims, `ICurrentUser` |
-| 6  | **Categories feature (CRUD, user-scoped)** | Endpoint groups, EF queries, ownership enforcement |
-| 7  | **Expenses feature (CRUD) + validation** | FluentValidation, model binding, filters |
-| 8  | **Custom middleware** (correlation id / request logging) | Middleware pipeline, `ILogger` scopes |
-| 9  | **Global exception handling + ProblemDetails** | `IExceptionHandler`, RFC 7807 responses |
-| 10 | **Summary/reporting endpoints** | LINQ aggregation, projection to DTOs |
-| 11 | **Background service / scheduler** (monthly rollup) | `BackgroundService`, scoped service resolution, `PeriodicTimer` |
-| 12 | **Tests** (unit + integration) | xUnit, `WebApplicationFactory`, Testcontainers |
-| 13 | **Polish**: pagination, rate limiting, OpenAPI, health checks, Docker | production concerns |
+| 5  | **Authorization + current-user accessor** | `[Authorize]` / `RequireAuthorization`, claims, `ICurrentUser` (reused by GraphQL) |
+| 6  | **GraphQL setup (Hot Chocolate)** + first authorized query (`me`) | `/graphql`, schema config, JWT `[Authorize]` in resolvers, Banana Cake Pop |
+| 7  | **Categories — GraphQL queries + mutations** (user-scoped) | Query/Mutation types, EF integration, ownership enforcement |
+| 8  | **Expenses — GraphQL queries + mutations + validation** | FluentValidation in mutations, input types, filtering/paging |
+| 9  | **GraphQL error handling** + global exception handling | Error filters, `ProblemDetails` for REST, GraphQL error mapping |
+| 10 | **Summary/reporting (GraphQL)** | LINQ aggregation, projection to GraphQL types |
+| 11 | **Custom middleware** (correlation id / request logging) | Middleware pipeline, `ILogger` scopes (covers both REST + GraphQL) |
+| 12 | **Background service / scheduler** (monthly rollup) | `BackgroundService`, scoped service resolution, `PeriodicTimer` |
+| 13 | **Tests** (unit + integration) | xUnit, `WebApplicationFactory`, Testcontainers; GraphQL request tests |
+| 14 | **Polish**: paging, rate limiting, health checks, Docker | production concerns |
 
 ---
 
 ## Decisions made
 
 - **Database:** PostgreSQL via Docker (`docker compose up db`).
-- **API style:** **Minimal APIs** with feature-grouped endpoint registration.
+- **API style:** **Hybrid** — REST (Minimal APIs) for auth; **GraphQL (Hot
+  Chocolate, annotation-based)** at `/graphql` for all data features. Both share
+  the same JWT.
 - **Architecture:** single Web project, folders by responsibility (Domain /
-  Infrastructure / Features / Common / Middleware), vertical slices per feature.
+  Infrastructure / Features / GraphQL / Common / Middleware), vertical slices per
+  feature.
 
 ## Conventions
 
@@ -123,6 +154,7 @@ src/DotnetApp/
 | `02-di-and-options.md` | ✅ step 2 done |
 | `03-auth-register-login.md` | ✅ step 3 done |
 | `04-jwt-auth.md` | ✅ step 4 done |
+| `05-current-user.md` | ✅ step 5 done |
 
 ---
 
@@ -134,6 +166,8 @@ src/DotnetApp/
 - ✅ **Step 2 done** — DI registration extensions + Options pattern (`JwtOptions`).
 - ✅ **Step 3 done** — Auth (register + login), Result pattern, PBKDF2 hashing; tested over HTTP.
 - ✅ **Step 4 done** — JWT issuing + authentication; token on register/login, protected `/me`; tested.
-- 🔜 **Next: Step 5 — Authorization + `ICurrentUser` accessor (replace ad-hoc `/me`).**
+- 🔄 **Plan updated** — API is now **hybrid**: REST auth (done) + GraphQL for data features (Step 6+).
+- ✅ **Step 5 done** — `ICurrentUser` accessor; `/me` refactored; tested.
+- 🔜 **Next: Step 6 — GraphQL setup (Hot Chocolate) + first authorized `me` query.**
 
-Say **"next"** when ready for Step 5.
+Say **"next"** when ready for Step 6.

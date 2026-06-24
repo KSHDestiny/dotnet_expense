@@ -1,5 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using DotnetApp.Common;
 using DotnetApp.Features.Auth;
 using DotnetApp.Infrastructure.Persistence;
 
@@ -31,12 +30,11 @@ app.MapGet("/", () => Results.Ok(new { status = "ok" }))
 
 app.MapAuthEndpoints();
 
-// Temporary: proves token validation works. Returns the caller's claims.
-// Replaced by a proper current-user accessor in Step 5.
-app.MapGet("/me", (ClaimsPrincipal user) => Results.Ok(new
+// Reads identity via the injected ICurrentUser accessor (no inline claim parsing).
+app.MapGet("/me", (ICurrentUser currentUser) => Results.Ok(new
 {
-    id = user.FindFirstValue(JwtRegisteredClaimNames.Sub),
-    email = user.FindFirstValue(JwtRegisteredClaimNames.Email)
+    id = currentUser.Id,
+    email = currentUser.Email
 }))
 .RequireAuthorization();
 

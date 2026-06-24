@@ -122,6 +122,7 @@ src/DotnetApp/
 | `01-ef-core-setup.md` | ✅ step 1 done |
 | `02-di-and-options.md` | ✅ step 2 done |
 | `03-auth-register-login.md` | ✅ step 3 done |
+| `04-jwt-auth.md` | ✅ step 4 done |
 
 ---
 
@@ -132,6 +133,7 @@ src/DotnetApp/
 - ✅ **Step 1 done** — EF Core + `User` entity + `users` table migrated & verified.
 - ✅ **Step 2 done** — DI registration extensions + Options pattern (`JwtOptions`).
 - ✅ **Step 3 done** — Auth (register + login), Result pattern, PBKDF2 hashing; tested over HTTP.
-- 🔜 **Next: Step 4 — JWT issuing + authentication (wire up `JwtOptions`).**
+- ✅ **Step 4 done** — JWT issuing + authentication; token on register/login, protected `/me`; tested.
+- 🔜 **Next: Step 5 — Authorization + `ICurrentUser` accessor (replace ad-hoc `/me`).**
 
-Say **"next"** when ready for Step 4.
+Say **"next"** when ready for Step 5.

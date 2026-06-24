@@ -1,0 +1,32 @@
+### Protected endpoint test — JWT bearer auth (VS Code REST Client)
+#
+# 1. Run the "login" request first (it captures the token via @name).
+# 2. Then send the /me requests below — they reuse {{login.response.body.token}}.
+
+@host = http://localhost:8000
+@contentType = application/json
+
+
+### Login to obtain a token (run this first)
+# @name login
+POST {{host}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "alice@example.com",
+  "password": "supersecret"
+}
+
+
+### /me WITH token (expect 200 + id/email from claims)
+GET {{host}}/me
+Authorization: Bearer {{login.response.body.token}}
+
+
+### /me WITHOUT token (expect 401)
+GET {{host}}/me
+
+
+### /me with an invalid token (expect 401)
+GET {{host}}/me
+Authorization: Bearer not.a.real.token

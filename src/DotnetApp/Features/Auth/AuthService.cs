@@ -12,8 +12,14 @@ public interface IAuthService
     Task<Result<AuthResponse>> LoginAsync(LoginRequest request, CancellationToken ct);
 }
 
-public sealed class AuthService(AppDbContext db, IPasswordHasher passwordHasher) : IAuthService
+public sealed class AuthService(
+    AppDbContext db,
+    IPasswordHasher passwordHasher,
+    IJwtTokenService tokenService) : IAuthService
 {
+    private AuthResponse ToResponse(User user) =>
+        new(user.Id, user.Name, user.Email, tokenService.CreateToken(user));
+
     public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, CancellationToken ct)
     {
         var email = request.Email.Trim().ToLowerInvariant();
@@ -44,7 +50,7 @@ public sealed class AuthService(AppDbContext db, IPasswordHasher passwordHasher)
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);
 
-        return new AuthResponse(user.Id, user.Name, user.Email);
+        return ToResponse(user);
     }
 
     public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request, CancellationToken ct)
@@ -58,6 +64,6 @@ public sealed class AuthService(AppDbContext db, IPasswordHasher passwordHasher)
         if (user is null || !passwordHasher.Verify(request.Password, user.PasswordHash))
             return Result.Failure<AuthResponse>(Error.Unauthorized("Invalid email or password."));
 
-        return new AuthResponse(user.Id, user.Name, user.Email);
+        return ToResponse(user);
     }
 }

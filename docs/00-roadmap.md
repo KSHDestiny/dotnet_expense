@@ -120,6 +120,7 @@ src/DotnetApp/
 |-----|--------|
 | `00-roadmap.md` | ✅ this file |
 | `01-ef-core-setup.md` | ✅ step 1 done |
+| `02-di-and-options.md` | ✅ step 2 done |
 
 ---
 
@@ -128,6 +129,7 @@ src/DotnetApp/
 - ✅ Project scaffolded, runs (`dotnet run`), OpenAPI on.
 - ✅ Docker compose with Postgres + JWT env vars ready.
 - ✅ **Step 1 done** — EF Core + `User` entity + `users` table migrated & verified.
-- 🔜 **Next: Step 2 — folder structure conventions + DI registration extensions + Options pattern.**
+- ✅ **Step 2 done** — DI registration extensions + Options pattern (`JwtOptions`).
+- 🔜 **Next: Step 3 — Auth feature (register + login) with password hashing.**
 
-Say **"next"** when ready for Step 2.
+Say **"next"** when ready for Step 3.

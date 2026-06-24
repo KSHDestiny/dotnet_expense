@@ -1,16 +1,11 @@
 using DotnetApp.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Service registration. Each AddXxx groups one concern (see the extension methods),
+// keeping this composition root readable as the app grows.
 builder.Services.AddOpenApi();
-
-// EF Core (PostgreSQL). Registered scoped — one DbContext per request.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
-           .UseSnakeCaseNamingConvention());
+builder.Services.AddPersistence(builder.Configuration);
 
 var app = builder.Build();
 

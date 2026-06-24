@@ -157,6 +157,7 @@ src/DotnetApp/
 | `05-current-user.md` | ✅ step 5 done |
 | `06-graphql-setup.md` | ✅ step 6 done |
 | `07-categories-graphql.md` | ✅ step 7 done |
+| `08-expenses-graphql.md` | ✅ step 8 done |
 
 ---
 
@@ -172,6 +173,7 @@ src/DotnetApp/
 - ✅ **Step 5 done** — `ICurrentUser` accessor; `/me` refactored; tested.
 - ✅ **Step 6 done** — GraphQL (`/graphql`) live; authorized `me` query reuses the JWT + `ICurrentUser`; tested.
 - ✅ **Step 7 done** — Categories GraphQL CRUD (queries + mutations), user-scoped; cross-user isolation verified.
-- 🔜 **Next: Step 8 — Expenses: GraphQL CRUD + FluentValidation (FK to Category, RESTRICT delete).**
+- ✅ **Step 8 done** — Expenses GraphQL CRUD + FluentValidation; two-level ownership, RESTRICT delete; tested.
+- 🔜 **Next: Step 9 — GraphQL error handling + global exception handling (clean errors, no leaks).**
 
-Say **"next"** when ready for Step 8.
+Say **"next"** when ready for Step 9.

@@ -1,0 +1,119 @@
+### Expenses — GraphQL queries + mutations (VS Code REST Client)
+#
+# Run in order: login -> createCategory -> createExpense -> the rest.
+# Ids are chained from earlier responses.
+
+@host = http://localhost:8000
+@contentType = application/json
+
+
+### Login (REST) — run first
+# @name login
+POST {{host}}/auth/login
+Content-Type: {{contentType}}
+
+{ "email": "alice@example.com", "password": "supersecret" }
+
+
+### Create a category (needed to file an expense under)
+# @name createCategory
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($input: CreateCategoryInput!) { createCategory(input: $input) { id name } }",
+  "variables": { "input": { "name": "Drink" } }
+}
+
+
+### Create an expense (category id chained from above)
+# @name createExpense
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($input: CreateExpenseInput!) { createExpense(input: $input) { id amount note spentAt categoryId } }",
+  "variables": {
+    "input": {
+      "categoryId": "{{createCategory.response.body.$.data.createCategory.id}}",
+      "amount": 12.50,
+      "note": "Lunch",
+      "spentAt": "2026-06-20T10:00:00Z"
+    }
+  }
+}
+
+
+### My expenses (no filter)
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "{ myExpenses { id amount note spentAt categoryId } }"
+}
+
+
+### My expenses — filtered by category + date range
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "query ($categoryId: UUID, $from: DateTime, $to: DateTime) { myExpenses(categoryId: $categoryId, from: $from, to: $to) { id amount spentAt } }",
+  "variables": {
+    "categoryId": "{{createCategory.response.body.$.data.createCategory.id}}",
+    "from": "2026-06-01T00:00:00Z",
+    "to": "2026-06-30T23:59:59Z"
+  }
+}
+
+
+### Update an expense (ids chained)
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($input: UpdateExpenseInput!) { updateExpense(input: $input) { id amount note } }",
+  "variables": {
+    "input": {
+      "id": "{{createExpense.response.body.$.data.createExpense.id}}",
+      "categoryId": "{{createCategory.response.body.$.data.createCategory.id}}",
+      "amount": 25.00,
+      "note": "Dinner",
+      "spentAt": "2026-06-21T19:00:00Z"
+    }
+  }
+}
+
+
+### Validation failure — amount 0 (expect VALIDATION error)
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($input: CreateExpenseInput!) { createExpense(input: $input) { id } }",
+  "variables": {
+    "input": {
+      "categoryId": "{{createCategory.response.body.$.data.createCategory.id}}",
+      "amount": 0,
+      "note": "invalid",
+      "spentAt": "2026-06-20T10:00:00Z"
+    }
+  }
+}
+
+
+### Delete an expense (id chained)
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($id: UUID!) { deleteExpense(id: $id) }",
+  "variables": { "id": "{{createExpense.response.body.$.data.createExpense.id}}" }
+}

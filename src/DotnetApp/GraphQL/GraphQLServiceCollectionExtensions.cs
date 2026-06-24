@@ -1,4 +1,5 @@
 using DotnetApp.Features.Categories;
+using DotnetApp.Features.Expenses;
 using HotChocolate.Execution.Configuration;
 
 namespace DotnetApp.GraphQL;
@@ -17,14 +18,20 @@ public static class GraphQLServiceCollectionExtensions
             .AddAuthorization()           // wires [Authorize] resolvers to ASP.NET Core auth
             .AddQueryType<Query>()        // root read type
             .AddMutationType<Mutation>()  // root write type
-            .AddCategoryTypes();          // feature type extensions
+            .AddCategoryTypes()           // feature type extensions
+            .AddExpenseTypes();
 
         return services;
     }
 
-    // Feature registration kept beside the feature it serves (see Features/Categories).
+    // Feature registration kept beside the feature it serves.
     private static IRequestExecutorBuilder AddCategoryTypes(this IRequestExecutorBuilder builder) =>
         builder
             .AddTypeExtension<CategoryQueries>()
             .AddTypeExtension<CategoryMutations>();
+
+    private static IRequestExecutorBuilder AddExpenseTypes(this IRequestExecutorBuilder builder) =>
+        builder
+            .AddTypeExtension<ExpenseQueries>()
+            .AddTypeExtension<ExpenseMutations>();
 }

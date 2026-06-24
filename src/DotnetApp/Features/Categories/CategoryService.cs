@@ -77,6 +77,12 @@ public sealed class CategoryService(AppDbContext db, ICurrentUser currentUser) :
         if (category is null)
             return Result.Failure(Error.NotFound("Category not found."));
 
+        // The DB FK is RESTRICT; pre-check so we return a clean Conflict instead of
+        // letting the constraint violation surface as an unhandled DB exception.
+        var inUse = await db.Expenses.AnyAsync(e => e.CategoryId == id, ct);
+        if (inUse)
+            return Result.Failure(Error.Conflict("Category has expenses and cannot be deleted."));
+
         db.Categories.Remove(category);
         await db.SaveChangesAsync(ct);
 

@@ -1,0 +1,64 @@
+### Categories — GraphQL queries + mutations (VS Code REST Client)
+#
+# 1. Run "login" first to capture a token.
+# 2. The operations below reuse {{login.response.body.token}}.
+
+@host = http://localhost:8000
+@contentType = application/json
+
+
+### Login (REST) to obtain a token — run first
+# @name login
+POST {{host}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "alice@example.com",
+  "password": "supersecret"
+}
+
+
+### Create a category (run before update/delete — its id is chained below)
+# @name createCategory
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($input: CreateCategoryInput!) { createCategory(input: $input) { id name createdAt } }",
+  "variables": { "input": { "name": "Food" } }
+}
+
+
+### My categories
+# @name myCategories
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "{ myCategories { id name createdAt } }"
+}
+
+
+### Update a category — id chained from the createCategory response above
+# (alternative: {{myCategories.response.body.$.data.myCategories[0].id}})
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($input: UpdateCategoryInput!) { updateCategory(input: $input) { id name } }",
+  "variables": { "input": { "id": "{{createCategory.response.body.$.data.createCategory.id}}", "name": "Groceries" } }
+}
+
+
+### Delete a category — id chained from the createCategory response above
+POST {{host}}/graphql
+Content-Type: {{contentType}}
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "query": "mutation ($id: UUID!) { deleteCategory(id: $id) }",
+  "variables": { "id": "{{createCategory.response.body.$.data.createCategory.id}}" }
+}

@@ -1,4 +1,5 @@
 using DotnetApp.Features.Auth;
+using DotnetApp.Features.Categories;
 using DotnetApp.GraphQL;
 using DotnetApp.Infrastructure.Persistence;
 
@@ -10,6 +11,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddAuth();
 builder.Services.AddJwtAuth(builder.Configuration);
+builder.Services.AddCategories();
 builder.Services.AddGraphQLApi();
 
 var app = builder.Build();

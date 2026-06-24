@@ -156,6 +156,7 @@ src/DotnetApp/
 | `04-jwt-auth.md` | ✅ step 4 done |
 | `05-current-user.md` | ✅ step 5 done |
 | `06-graphql-setup.md` | ✅ step 6 done |
+| `07-categories-graphql.md` | ✅ step 7 done |
 
 ---
 
@@ -170,6 +171,7 @@ src/DotnetApp/
 - 🔄 **Plan updated** — API is now **hybrid**: REST auth (done) + GraphQL for data features (Step 6+).
 - ✅ **Step 5 done** — `ICurrentUser` accessor; `/me` refactored; tested.
 - ✅ **Step 6 done** — GraphQL (`/graphql`) live; authorized `me` query reuses the JWT + `ICurrentUser`; tested.
-- 🔜 **Next: Step 7 — Categories: GraphQL queries + mutations (user-scoped).**
+- ✅ **Step 7 done** — Categories GraphQL CRUD (queries + mutations), user-scoped; cross-user isolation verified.
+- 🔜 **Next: Step 8 — Expenses: GraphQL CRUD + FluentValidation (FK to Category, RESTRICT delete).**
 
-Say **"next"** when ready for Step 7.
+Say **"next"** when ready for Step 8.

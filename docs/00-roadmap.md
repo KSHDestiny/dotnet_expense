@@ -121,6 +121,7 @@ src/DotnetApp/
 | `00-roadmap.md` | ✅ this file |
 | `01-ef-core-setup.md` | ✅ step 1 done |
 | `02-di-and-options.md` | ✅ step 2 done |
+| `03-auth-register-login.md` | ✅ step 3 done |
 
 ---
 
@@ -130,6 +131,7 @@ src/DotnetApp/
 - ✅ Docker compose with Postgres + JWT env vars ready.
 - ✅ **Step 1 done** — EF Core + `User` entity + `users` table migrated & verified.
 - ✅ **Step 2 done** — DI registration extensions + Options pattern (`JwtOptions`).
-- 🔜 **Next: Step 3 — Auth feature (register + login) with password hashing.**
+- ✅ **Step 3 done** — Auth (register + login), Result pattern, PBKDF2 hashing; tested over HTTP.
+- 🔜 **Next: Step 4 — JWT issuing + authentication (wire up `JwtOptions`).**
 
-Say **"next"** when ready for Step 3.
+Say **"next"** when ready for Step 4.

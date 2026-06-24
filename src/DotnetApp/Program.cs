@@ -1,3 +1,4 @@
+using DotnetApp.Features.Auth;
 using DotnetApp.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // keeping this composition root readable as the app grows.
 builder.Services.AddOpenApi();
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddAuth();
 
 var app = builder.Build();
 
@@ -19,5 +21,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("/", () => Results.Ok(new { status = "ok" }))
    .WithName("Root");
+
+app.MapAuthEndpoints();
 
 app.Run();

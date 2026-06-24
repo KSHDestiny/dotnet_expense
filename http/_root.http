@@ -1,0 +1,16 @@
+### DotnetApp — HTTP request collection (VS Code REST Client / Visual Studio / Rider)
+#
+# Usage:
+#   - Start the API:  dotnet run --project src/DotnetApp
+#   - Click "Send Request" above any request below.
+#   - Switch @host between the values to target http / https / docker.
+#
+# Per-feature collections live in this same folder, e.g. http/auth.http
+
+@host = http://localhost:8000
+# @host = https://localhost:8080
+# @host = http://localhost:8080      # docker compose (api service)
+
+### Health check
+GET {{host}}/
+Accept: application/json

@@ -1,0 +1,77 @@
+### Auth feature — register + login (VS Code REST Client / Visual Studio / Rider)
+#
+# Start the API first:  dotnet run --project src/DotnetApp
+# Then click "Send Request" above any request.
+
+@host = http://localhost:8000
+# @host = http://localhost:8080      # docker compose
+@contentType = application/json
+
+# Use a unique email per fresh run so "register success" stays 201 instead of 409.
+@email = alice@example.com
+@password = supersecret
+
+
+### Register — success (expect 201 Created; Location header; body has no passwordHash)
+# @name register
+POST {{host}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Alice",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+
+### Register — duplicate email (expect 409 Conflict)
+POST {{host}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Alice Again",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+
+### Register — short password (expect 400 Validation)
+POST {{host}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Bob",
+  "email": "bob@example.com",
+  "password": "short"
+}
+
+
+### Login — success (expect 200 + user)
+# @name login
+POST {{host}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+
+### Login — wrong password (expect 401)
+POST {{host}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{email}}",
+  "password": "wrongpassword"
+}
+
+
+### Login — unknown email (expect 401, identical to wrong-password — no account enumeration)
+POST {{host}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "nobody@example.com",
+  "password": "whatever1"
+}

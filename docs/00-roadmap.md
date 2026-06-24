@@ -155,6 +155,7 @@ src/DotnetApp/
 | `03-auth-register-login.md` | ✅ step 3 done |
 | `04-jwt-auth.md` | ✅ step 4 done |
 | `05-current-user.md` | ✅ step 5 done |
+| `06-graphql-setup.md` | ✅ step 6 done |
 
 ---
 
@@ -168,6 +169,7 @@ src/DotnetApp/
 - ✅ **Step 4 done** — JWT issuing + authentication; token on register/login, protected `/me`; tested.
 - 🔄 **Plan updated** — API is now **hybrid**: REST auth (done) + GraphQL for data features (Step 6+).
 - ✅ **Step 5 done** — `ICurrentUser` accessor; `/me` refactored; tested.
-- 🔜 **Next: Step 6 — GraphQL setup (Hot Chocolate) + first authorized `me` query.**
+- ✅ **Step 6 done** — GraphQL (`/graphql`) live; authorized `me` query reuses the JWT + `ICurrentUser`; tested.
+- 🔜 **Next: Step 7 — Categories: GraphQL queries + mutations (user-scoped).**
 
-Say **"next"** when ready for Step 6.
+Say **"next"** when ready for Step 7.

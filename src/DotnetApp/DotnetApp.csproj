@@ -5,10 +5,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>52c3500c-6601-4eee-9fe4-126a2e423c21</UserSecretsId>
+    <!-- Hot Chocolate injects implicit usings (incl. `global using GreenDonut;`,
+         whose Result<T> collides with our domain Result<T>). Disable HC's implicit
+         usings; we import HotChocolate namespaces explicitly where needed. -->
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="16.2.3" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="16.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
